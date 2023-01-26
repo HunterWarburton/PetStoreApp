@@ -1,4 +1,9 @@
+using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
+
+//Made By Hunter Warburton
+//January 25th 2023
 
 class PetCollection
 {
@@ -6,6 +11,15 @@ class PetCollection
     private string filePath = "pets.txt";
     public void SavePets()
     {
+        using (StreamWriter writer = new StreamWriter("pets.txt"))
+        {
+            foreach (Pet pet in MyPets)
+            {
+                string petType = pet.GetType().ToString();
+                writer.WriteLine(petType +","+ pet.Name + "," + pet.HungerLevel + "," + pet.Happiness);
+            }
+        }
+        /*
         // Create a string builder to store the pet information
         StringBuilder sb = new StringBuilder();
 
@@ -20,6 +34,56 @@ class PetCollection
 
         // Write the string builder to the file
         File.WriteAllText(filePath, sb.ToString());
+        */
+    }
+
+    public void LoadPets(PetCollection collection)
+    {
+            try
+            {
+                using (StreamReader sr = new StreamReader("pets.txt"))
+                {
+                    string line;
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        string[] parts = line.Split(',');
+                        string type = parts[0];
+                        string name = parts[1];
+                        int happiness = int.Parse(parts[2]);
+                        int hunger = int.Parse(parts[3]);
+                        Pet newPet;
+                        if (type == "Dog")
+                        {
+                            newPet = new Dog();
+                        }
+                        else if (type == "Cat")
+                        {
+                            newPet = new Cat();
+                        }
+                        else if (type == "Plant")
+                        {
+                            newPet = new Plant();
+                        }
+                        else if (type == "Fish")
+                        {
+                            newPet = new Fish();
+                        }
+                        else
+                        {
+                            newPet = new Pet(name, happiness, hunger);
+                        }
+                        newPet.Name = name;
+                        newPet.Happiness = happiness;
+                        newPet.HungerLevel = hunger;
+                        collection.AddPet(newPet);
+                    }
+                }
+                Console.WriteLine("Past Pets Loaded!");
+            }
+            catch (FileNotFoundException ex)
+            {
+                Console.WriteLine("No save data found.");
+            }
     }
 
     public PetCollection()
@@ -98,20 +162,42 @@ class PetApplication : IPetInteraction
         bool isValid = false;
         while(!isValid)
         {
-            // Display available pets
-            ListPetsInStore();
-            // Acquire pet code
-            Console.WriteLine("Type the kind of the pet you want to acquire:");
-        
-            string petType = Console.ReadLine();
-            //check to see if user entered a number
-            if (int.TryParse(petType, out int value))
+            string petType = "";
+
+            bool isValid2 = false;
+            while (!isValid2)
             {
-                //Yes, the user entered a number. Now convert that to the pet name
-                petType = store.AvailablePets[value - 1].Type;
+                // Display available pets
+                Console.WriteLine("0. Go Back Without A Pet");
+                ListPetsInStore();
+                // Acquire pet code
+                Console.WriteLine("Type the kind of the pet you want to acquire:");
+
+                petType = Console.ReadLine();
+                //check to see if user entered a number
+                if (int.TryParse(petType, out int value))
+                {
+                    if (value > 0 && value <= store.AvailablePets.Count)
+                    {
+                        //Yes, the user entered a valid number. Now convert that to the pet name 
+                        isValid2 = true;
+                        petType = store.AvailablePets[value - 1].Type;
+                    }
+                    else if (value == 0)
+                    {
+                        isValid2 = true;
+                        petType = "0";
+                    }
+                    else //some outside number
+                    {
+                        Console.WriteLine("Invalid input. Please enter a number between " + 0 + " and " + store.AvailablePets.Count);
+                    }
+                } else isValid2 = true;
+
             }
-                //make the entered pet name lowercase and compare to also lowercased names
-                petType = petType.ToLower();
+
+            //make the entered pet name lowercase and compare to also lowercased names
+            petType = petType.ToLower();
             Pet selectedPet = store.AvailablePets.Find(p => p.Type.ToLower() == petType);
             if(selectedPet != null)
             {
@@ -133,6 +219,7 @@ class PetApplication : IPetInteraction
                         newPet = new Fish();
                         break;
                     default:
+                        Console.WriteLine("Invalid pet name. Please type the pet name or number.");
                         return;
                 }
 
@@ -157,11 +244,18 @@ class PetApplication : IPetInteraction
                 // Start the pet's hunger and happiness timers
                 collection.StartHungerTimer(newPet);
             }
-            else
+            else if (petType == "0")
+            {
+                isValid = true;
+                Console.WriteLine("You left without a new pet");
+            }
+            else //to handle more errors
             {
                 Console.WriteLine("Invalid pet name. Please type the pet name or number.");
             }
+
         }
+
     }
 
     public void InteractWithPet(PetCollection collection)
@@ -175,9 +269,13 @@ class PetApplication : IPetInteraction
 
             // Interact with pet code
             Console.WriteLine("Select a pet number to interact with:");
+            Console.WriteLine("0. Go back");
             ListMyPets(collection);
 
-            int choice = validation.GetValidNumber( 1 , collection.MyPets.Count);
+            int choice = validation.GetValidNumber( 0 , collection.MyPets.Count);
+
+            if (choice != 0)
+            {
 
                 Pet selectedPet = collection.MyPets[choice - 1];
 
@@ -214,6 +312,7 @@ class PetApplication : IPetInteraction
                     string interactionChoice = Console.ReadLine();
                     interactionChoice = interactionChoice.ToLower();
                     collection.InteractWithPet(selectedPet, interactionChoice);
+                }
             }
         }
     }
@@ -228,15 +327,18 @@ class PetApplication : IPetInteraction
         {
             // Feed pet code
             Console.WriteLine("Select a pet to feed:");
+            Console.WriteLine("0. Go back");
             ListMyPets(collection);
 
-            int choice = validation.GetValidNumber(1, collection.MyPets.Count);
+            int choice = validation.GetValidNumber(0, collection.MyPets.Count);
 
-            Pet selectedPet = collection.MyPets[choice - 1];
+            if (choice != 0)
+            {
+                Pet selectedPet = collection.MyPets[choice - 1];
 
                 Console.WriteLine("Select a food to feed " + selectedPet.Name + ":");
                 List<string> possibleFoods = new List<string>
-                { 
+                {
                     "Bacon Snack", "Dry Dog Food", "Tuna", "Dry Cat Food", "Water", "Plant Food", "Fish Food"
                 };
                 int index = 1;
@@ -250,6 +352,7 @@ class PetApplication : IPetInteraction
 
                 string selectedFood = possibleFoods[foodChoice - 1].ToLower();
                 collection.FeedPet(selectedPet, selectedFood);
+            }
         }
     }
 

@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 
+//Made By Hunter Warburton
+//January 25th 2023
+
 class PetStore
 {
     public List<Pet> AvailablePets { get; set;}
@@ -73,10 +76,13 @@ class PetAppMainProgram
         Console.WriteLine("          .__....._           _.....__,\n            .^: o :':         ;': o :^.\n            `. `-' .'.       .'. `-'.'\n              `---'             `---'\n              \n    _...----...      ...   ...      ...----..._\n .- '__..-^^'----    `.  `^`  .'    ----'^^-..__`-.\n'.-'   _.--^^^'       `-._.-'       '^^^--._   `-.`\n'  .-^'                  :                  `^-.  `\n  '   `.              _.'^'._              .'   `\n        `.       ,.-'^       ^' -.,       .'\n          `.                           .'\n            `-._                   _.- '\n                `^'--...___...--'^`\n");
 
         Console.WriteLine("**Pet Store App**");
-        Console.WriteLine("\n In this program you may aquire and take care of multiple pets.\nThey get hungry in real-time, so be sure to feed them what they like!");
-        Console.WriteLine("\n Type Anything and press Enter to Start...");
+        Console.WriteLine("\nIn this program you may aquire and take care of multiple pets.\nThey get hungry in real-time, so be sure to feed them what they like!");
+        Console.WriteLine("\nType Anything and press Enter to Start...");
         Console.ReadLine();
         Console.Clear();
+
+        //Try to load old pets
+        collection.LoadPets(collection);
 
         // Start the main menu loop
         //The while statement makes it so that if the thread reaches the end of the loop (close bracket) it will jump back to the start of the loop

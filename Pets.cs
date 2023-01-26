@@ -1,6 +1,9 @@
 using System.Timers;
 using Timer = System.Timers.Timer;
 
+//Made By Hunter Warburton
+//January 25th 2023
+
 class Pet
 {
     public string Name { get; set; }
@@ -16,18 +19,18 @@ class Pet
     public int[,] FoodChangeArray { get; set;}
     public int[,] InteractionArray { get; set;}
 
-    public Pet(string name, string type, int hunger, int happiness, int maxHunger, int maxHappiness, int timerIncrement)
+    public Pet(string name, int hunger, int happiness)
     {
         Name = name;
-        Type = type;
+        Type = "";
         HungerLevel = hunger;
         Happiness = happiness;
-        MaxHunger = maxHunger;
-        MaxHappiness = maxHappiness;
+        MaxHunger = 2;
+        MaxHappiness = 2;
         LikedFoods = new List<string> {"food"};
         LikedInteractions = new List<string> {"provide affection"};
-        TimerIncrement = timerIncrement;
-        HungerTimer = new Timer(TimerIncrement);
+        TimerIncrement = 12000;
+        
     }
 
     public void Feed(string food)
@@ -112,8 +115,15 @@ class Pet
 
 class Dog : Pet
 {
-    public Dog() : base("Dog", "Dog", 2, 5, 10, 10, 120000)
+    public Dog() : base("Dog", 2, 5)
     {
+        Type = "Dog";
+        MaxHunger = 10;
+        MaxHappiness = 10;
+
+        TimerIncrement = 120000;
+        HungerTimer = new Timer(TimerIncrement);
+
         LikedFoods = new List<string> { "bacon snack", "dry dog food" };
         //Declare Food modifier array
         //HungerChange,HappinessChange
@@ -127,8 +137,15 @@ class Dog : Pet
 
 class Cat : Pet
 {
-    public Cat() : base("Cat", "Cat", 2, 4, 8, 5, 120000)
+    public Cat() : base("Cat", 2, 4)
     {
+        Type = "Cat";
+        MaxHunger = 8;
+        MaxHappiness = 5;
+
+        TimerIncrement = 120000;
+        HungerTimer = new Timer(TimerIncrement);
+
         LikedFoods = new List<string> { "tuna", "dry cat food" };
         //Declare Food modifier array
         //HungerChange,HappinessChange
@@ -142,8 +159,15 @@ class Cat : Pet
 
 class Plant : Pet
 {
-    public Plant() : base("Plant", "Plant", 5, 2, 6, 5, 60000)
+    public Plant() : base("Plant", 5, 2)
     {
+        Type = "Plant";
+        MaxHunger = 6;
+        MaxHappiness = 5;
+
+        TimerIncrement = 60000;
+        HungerTimer = new Timer(TimerIncrement);
+
         LikedFoods = new List<string> { "water", "plant food" };
         //Declare Food modifier array
         //HungerChange, HappinessChange
@@ -157,8 +181,15 @@ class Plant : Pet
 
 class Fish : Pet
 {
-    public Fish() : base("Fish", "Fish", 2, 2, 5, 5, 180000)
+    public Fish() : base("Fish", 2, 2)
 {
+        Type = "Fish";
+        MaxHunger = 5;
+        MaxHappiness = 5;
+
+        TimerIncrement = 180000;
+        HungerTimer = new Timer(TimerIncrement);
+
         LikedFoods = new List<string> { "fish food" };
         //Declare Food modifier array
         //HungerChange, HappinessChange
